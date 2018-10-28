@@ -14,7 +14,7 @@ public class LoadCustomFile : MonoBehaviour
         text = GetComponent<Text>();
         string[] args = System.Environment.GetCommandLineArgs();
         string cmdChain = args.Aggregate((a, b) => a + " " + b);
-        Debug.Log(args.Aggregate("CommandLineArgs : ",(a, b) => a + " , " + b));
+        Debug.Log(args.Aggregate("CommandLineArgs : ", (a, b) => a + " , " + b));
         Debug.Log(args.Aggregate("cmdChain : ", (a, b) => a + " " + b));
 
         if (args.Length > 1)
@@ -22,15 +22,21 @@ public class LoadCustomFile : MonoBehaviour
             if (!string.IsNullOrEmpty(args[1]))
             {
                 MatchCollection match = Regex.Matches(cmdChain, @"\.exe ([A-Za-z]:.+\.bian)", RegexOptions.Singleline);
-                text.text = match[1].Value;
+                //for (int i = 0; i < match.Count; i++)
+                //{
+                //    for (int j = 0; j < match[i].Groups.Count; j++)
+                //    {
+                //        Debug.Log(string.Format("match {0},groups {1}, value {2}",i,j,match[i].Groups[j]));
+                //    }
+                //}
+
+                if (match.Count > 0 && match[0].Groups.Count > 0)
+                {
+                    text.text = match[0].Groups[1].Value;
+                }
             }
         }
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
 }

@@ -53,7 +53,7 @@ public class FileTypeRegister
         catch (Exception)
         {
             UnityEngine.Debug.Log("注册表添加文件系统失败！");
-            DialogResult dialogResult = MessageBox.Show("重启并尝试以管理员身份运行？", "友情提示-" + UnityEngine.Application.productName, MessageBoxButtons.OKCancel);
+            DialogResult dialogResult = MessageBox.Show("添加失败，重启并尝试以管理员身份运行？", "友情提示-" + UnityEngine.Application.productName, MessageBoxButtons.OKCancel);
             if (dialogResult == DialogResult.OK)
             {
                 ReStartAs();
@@ -84,7 +84,7 @@ public class FileTypeRegister
             catch (System.Exception)
             {
                 UnityEngine.Debug.LogError("删除注册表操作失败！");
-                DialogResult dialogResult = MessageBox.Show("重启并尝试以管理员身份运行？", "友情提示-" + UnityEngine.Application.productName, MessageBoxButtons.OKCancel);
+                DialogResult dialogResult = MessageBox.Show("删除失败,重启并尝试以管理员身份？", "友情提示-" + UnityEngine.Application.productName, MessageBoxButtons.OKCancel);
                 if (dialogResult == DialogResult.OK)
                 {
                     ReStartAs();
@@ -108,19 +108,33 @@ public class FileTypeRegister
         {
             return false;
         }
-
-        string extendName = regInfo.ExtendName;
-        string relationName = extendName.Substring(1, extendName.Length - 1).ToUpper() + "_FileType";
-        RegistryKey relationKey = Registry.ClassesRoot.OpenSubKey(relationName, true);
-        relationKey.SetValue("", regInfo.Description);
-        RegistryKey iconKey = relationKey.OpenSubKey("DefaultIcon", true);
-        iconKey.SetValue("", regInfo.IconPath);
-        RegistryKey shellKey = relationKey.OpenSubKey("Shell");
-        RegistryKey openKey = shellKey.OpenSubKey("Open");
-        RegistryKey commandKey = openKey.OpenSubKey("Command", true);
-        commandKey.SetValue("", regInfo.ExePath + " %1");
-        relationKey.Close();
-        return true;
+        try
+        {
+            string extendName = regInfo.ExtendName;
+            string relationName = extendName.Substring(1, extendName.Length - 1).ToUpper() + "_FileType";
+            RegistryKey relationKey = Registry.ClassesRoot.OpenSubKey(relationName, true);
+            relationKey.SetValue("", regInfo.Description);
+            RegistryKey iconKey = relationKey.OpenSubKey("DefaultIcon", true);
+            iconKey.SetValue("", regInfo.IconPath);
+            RegistryKey shellKey = relationKey.OpenSubKey("Shell");
+            RegistryKey openKey = shellKey.OpenSubKey("Open");
+            RegistryKey commandKey = openKey.OpenSubKey("Command", true);
+            commandKey.SetValue("", regInfo.ExePath + " %1");
+            relationKey.Close();
+            SHChangeNotify(0x8000000, 0, IntPtr.Zero, IntPtr.Zero);
+            return true;
+        }
+        catch (System.Exception)
+        {
+            UnityEngine.Debug.LogError("更新注册表操作失败！");
+            DialogResult dialogResult = MessageBox.Show("更新失败,重启并尝试以管理员身份？", "友情提示-" + UnityEngine.Application.productName, MessageBoxButtons.OKCancel);
+            if (dialogResult == DialogResult.OK)
+            {
+                ReStartAs();
+            }
+            return false;
+        }
+        
     }
 
     /// <summary>  
